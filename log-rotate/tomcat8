@@ -1,0 +1,19 @@
+/var/lib/tomcat8/logs/*.log {
+  copytruncate
+  daily
+  rotate 7
+  compress
+  missingok
+
+
+}
+/var/lib/tomcat8/logs/catalina.out {
+  copytruncate
+  daily
+  rotate 7
+  compress
+  missingok
+
+}
+
+

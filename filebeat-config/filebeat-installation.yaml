@@ -1,0 +1,32 @@
+- name: ANSIBLE - Filebeat installation and configuration 
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+
+  - name: Download and install filebeats deb
+    apt:
+      deb: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.2.3-amd64.deb
+
+
+      #  - name: APT - Add elastic.co repository
+      #apt_repository: repo="deb https://artifacts.elastic.co/packages/5.x/apt stable main" filename="elastic-5.x" update_cache=yes
+      #when: ansible_distribution == "Ubuntu"
+
+ 
+  - name: FILEBEAT - Copy base filebeat config file
+    copy: src=/home/ubuntu/filebeat.yml dest=/etc/filebeat/filebeat.yml
+
+
+
+  - name: Removing old Registry
+    shell: rm -rf /var/lib/filebeat/registry
+
+
+
+
+
+    
+
+

@@ -1,0 +1,28 @@
+- name: Prtg agent - Snmpd installation and configuration
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+
+  - name: Download and install snmpd
+    apt:
+      name: snmpd
+      state: present
+
+
+
+
+
+  - name: move snmpd config file to snmp directory 
+    shell: mv -f snmpd.conf /etc/snmp/snmpd.conf
+    args:
+      chdir: "/home/ubuntu/"
+
+
+
+
+
+  - name: snmpd - Restart snmpd
+    service: name=snmpd state=restarted
+

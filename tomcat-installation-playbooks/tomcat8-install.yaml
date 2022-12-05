@@ -1,0 +1,106 @@
+-
+  name: tomcat8 installation
+  hosts: all
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+          #  - name: Update and upgrade apt packages
+          # apt:
+          # upgrade: yes
+          # update_cache: yes
+
+          #  - name: Copy file with owner and permissions
+#  copy:
+#   src: /root/packer/tomcat8.service
+#     dest: /etc/systemd/system/tomcat8.service
+
+
+  - name: move service file to service directory
+    shell: mv -f tomcat8.service /etc/systemd/system/tomcat8.service
+    args:
+      chdir: "/home/ubuntu/"
+
+
+
+
+      # - name: Show host's ip
+      # debug:
+      # msg: "{{ ansible_ssh_host }}"
+
+  - name: Install a list of packages
+    apt:
+      pkg:
+      - openjdk-8-jdk
+      - wget
+      - iputils-ping
+      - net-tools
+      - vim
+      - dnsutils
+      - ssh
+      - telnet
+      - awscli
+
+  - name: Create a directory
+    file:
+      path: /var/lib/tomcat8
+      state: directory
+      mode: '0755'
+
+  - name: Download tomcat 8.5.81 tar
+    get_url:
+      url: https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.81/bin/apache-tomcat-8.5.81.tar.gz
+      dest: /tmp/tomcat.tar.gz
+
+  - name: Extract tomcat.tar.gz into /var/lib/tomcat
+    unarchive:
+      src: /tmp/tomcat.tar.gz
+      dest: /var/lib/tomcat8
+      extra_opts: [--strip-components=1]
+
+  - name: Creating setenv file
+    copy:
+      dest: "/var/lib/tomcat8/bin/setenv.sh"
+      content: |
+        #!/bin/sh
+        JAVA_OPTS="$JAVA_OPTS -Dspring.profiles.active=production"
+        export CATALINA_OPTS="-Xms512M -Xmx1024M"
+
+
+
+  - name: Removing old WAR
+    shell: rm -rf *
+    args:
+      chdir: "/var/lib/tomcat8/webapps/"
+
+
+
+
+
+  - name: create symlink
+    file:
+      path: "/var/log/tomcat8"
+      src: "/var/lib/tomcat8/logs"
+      state: link
+
+
+  - name: create user
+    user:
+      name: 
+
+      
+
+  - name: increase shutdown timeout
+    lineinfile:
+      path: /var/lib/tomcat8/bin/shutdown.sh
+      regexp: 'exec \"\$PRGDIR\"\/\"\$EXECUTABLE\" stop \"\$@\"'
+      line: 'exec "$PRGDIR"/"$EXECUTABLE" stop 120"$@"'
+
+  - name: Set timezone to Africa/Khartoum
+    timezone:
+      name: Africa/Khartoum
+
+      #  - name: snmpd - Restart tomcat
+      # service:
+      # name: tomcat8
+      # enabled: yes

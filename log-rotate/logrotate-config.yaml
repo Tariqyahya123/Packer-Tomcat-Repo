@@ -1,0 +1,13 @@
+- name: logrotate config
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+
+  - name: move tomcat logrotate config file to logrotate.d directory 
+    shell: mv -f tomcat8 /etc/logrotate.d/tomcat8
+    args:
+      chdir: "/home/ubuntu/"
+
+

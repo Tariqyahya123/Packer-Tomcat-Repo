@@ -1,0 +1,45 @@
+-
+  name: Node_exporter Deployment
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+    - name: create node_exporter Group
+      group:
+        name: node_exporter
+        state: present
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        groups: node_exporter
+    - name: download node exporter
+      get_url:
+        url: https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+        dest: /tmp
+    - name: unarchive node exporter
+      unarchive:
+        remote_src: yes
+        src: /tmp/node_exporter-1.3.1.linux-amd64.tar.gz
+        dest: /tmp
+    - name: move node exporter to /usr/local/bin
+      copy:
+        src: /tmp/node_exporter-1.3.1.linux-amd64/node_exporter
+        dest: /usr/local/bin/
+        remote_src: yes
+        owner: node_exporter
+        group: node_exporter
+        mode: 0755
+    - name: install unit file to systemd
+      template:
+        src: /home/ubuntu/node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+        owner: node_exporter
+        group: node_exporter
+        mode: 0600
+    - name: configure systemd to use service
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        state: started
+        name: node_exporter.service
+
